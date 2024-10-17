@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+  <changeSet author="Diego Viana Ferreira" id="00000000001">
+
+    <createTable tableName="products">
+      <column name="lm" type="bigint">
+        <constraints primaryKey="true" primaryKeyName="product_id_pk" nullable="false"/>
+      </column>
+      <column name="name" type="varchar(250)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="free_shipping" type="boolean" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="varchar(250)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="price" type="double">
+        <constraints nullable="false"/>
+      </column>
+      <column name="category" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_at" type="datetime">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+
+    <createTable tableName="processing_control">
+      <column name="id" autoIncrement="true"  type="bigint">
+        <constraints primaryKey="true" primaryKeyName="processing_control_id_pk"/>
+      </column>
+      <column name="initial_process_date" type="datetime">
+        <constraints nullable="false"/>
+      </column>
+      <column name="terminated_process_date" type="datetime"/>
+      <column name="processed" type="boolean" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <createTable tableName="processing_control_errors">
+      <column name="id" autoIncrement="true"  type="bigint">
+        <constraints primaryKey="true" primaryKeyName="processing_control_error_id_pk"/>
+      </column>
+      <column name="description" type="varchar(250)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="process_control_id" autoIncrement="true"  type="bigint">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseColumnNames="process_control_id"
+      baseTableName="processing_control_errors"
+      constraintName="fk_processing_control_errors_id"
+      referencedColumnNames="id"
+      referencedTableName="processing_control"/>
+
+  </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: ${SPRING_POSTGRES_URL}
+    username: ${SPRING_POSTGRES_USER}
+    password: ${SPRING_POSTGRES_PASS}

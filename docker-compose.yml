@@ -1,0 +1,72 @@
+version: '3.2'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - '~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/'
+    env_file:
+      - .env
+    environment:
+      - RABBITMQ_DEFAULT_USER=${SPRING_RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${SPRING_RABBITMQ_PASSWORD}
+    restart: always
+    networks:
+      - appfoobar
+
+  postgresql:
+    image: docker.io/bitnami/postgresql:13
+    container_name: postgresql
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+      - './creata-database.sql:/docker-entrypoint-initdb.d/init-database.sql'
+    env_file:
+      - .env      
+    environment:
+      - POSTGRESQL_USERNAME=${SPRING_POSTGRES_USER}
+      - POSTGRES_USER=admin
+      - POSTGRESQL_PASSWORD=${SPRING_POSTGRES_PASS}
+      - POSTGRESQL_DATABASE_SONAR=${POSTGRESQL_DATABASE_SONAR}
+      - POSTGRESQL_DATABASE_APP=${POSTGRESQL_DATABASE_APP}
+    restart: always      
+    networks:
+      - appfoobar
+
+  app-foobar:
+    build: .
+    image: app-foobar
+    container_name: app-foobar
+    ports:
+      - '80:8080'    
+    env_file:
+      - .env
+    environment:
+      - SPRING_APP_LOG=${SPRING_APP_LOG}
+      - SPRING_POSTGRES_URL=${SPRING_POSTGRES_URL}
+      - SPRING_POSTGRES_USER=${SPRING_POSTGRES_USER}
+      - SPRING_POSTGRES_PASS=${SPRING_POSTGRES_PASS}
+      - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
+      - SPRING_RABBITMQ_HOST=${SPRING_RABBITMQ_HOST}
+      - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
+      - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
+      - SPRING_RABBITMQ_ROUTINGKEY=${SPRING_RABBITMQ_ROUTINGKEY}
+      - SPRING_RABBITMQ_QUEUE=${SPRING_RABBITMQ_QUEUE}
+      - SPRING_RABBITMQ_EXCHANGE=${SPRING_RABBITMQ_EXCHANGE}
+    restart: always      
+    networks:
+      - appfoobar
+
+networks:
+  appfoobar:
+    driver: bridge
+
+volumes:
+  postgresql_data:
+    driver: local
